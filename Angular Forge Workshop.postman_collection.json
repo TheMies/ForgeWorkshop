@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "a7ced1ba-e136-4659-a4dd-900b8f5ef1be",
+		"name": "Angular Forge Workshop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1260478"
+	},
+	"item": [
+		{
+			"name": "Token 2-legged",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Encode the client_id and client_secret to a base64 encoded string\r",
+							"var cid = pm.environment.get('client_id');\r",
+							"var cse = pm.environment.get('client_secret');\r",
+							"\r",
+							"var utf8 = CryptoJS.enc.Utf8.parse(`${cid}:${cse}`);\r",
+							"\r",
+							"var encoded = CryptoJS.enc.Base64.stringify(utf8);\r",
+							"// console.log(`Encoded value: ${encoded}`) //if you want to see the value in the console\r",
+							"pm.environment.set(\"base64_encoded\", encoded);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var body = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"access_token\", body[\"access_token\"]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{base64_encoded}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost:4200/oauth/",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "data:read",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://developer.api.autodesk.com/authentication/v2/token",
+					"protocol": "https",
+					"host": [
+						"developer",
+						"api",
+						"autodesk",
+						"com"
+					],
+					"path": [
+						"authentication",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Hubs with 2 legged token",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://developer.api.autodesk.com/project/v1/hubs",
+					"protocol": "https",
+					"host": [
+						"developer",
+						"api",
+						"autodesk",
+						"com"
+					],
+					"path": [
+						"project",
+						"v1",
+						"hubs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Hubs with 3 legged token",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "useBrowser",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "scope",
+							"value": "data:read",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost:4200/oauth/",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "{{client_id}}",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "https://developer.api.autodesk.com/authentication/v2/authorize",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "access_token2",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "implicit",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://developer.api.autodesk.com/project/v1/hubs",
+					"protocol": "https",
+					"host": [
+						"developer",
+						"api",
+						"autodesk",
+						"com"
+					],
+					"path": [
+						"project",
+						"v1",
+						"hubs"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
